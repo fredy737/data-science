@@ -30,21 +30,19 @@ for i in range(len(time)):
     # Get datetime for the date
     date = reference_date + dt.timedelta(int(time[i]))
 
-    # Only look at 1992 and beyond
-    if date.year >= 1992:
-        # Key is (year, month)
-        key = (date.year, date.month)
-        
-        #humidity is (t, lat, lon), where t is the months
-        month_humidities = humidity[i].ravel()
+    # Key is (year, month)
+    key = (date.year, date.month)
 
-        humidity_grid[key] = {}
+    #humidity is (t, lat, lon), where t is the months
+    month_humidities = humidity[i].ravel()
 
-        for j in range(len(lat_long)):
-            # Look only at the latitudes and longitudes around the United States
-            if (lat_long[j][0] <= 70.5) and (lat_long[j][0] >= 17.5) \
-            and (lat_long[j][1] <= -64.5) and (lat_long[j][1] >= -179.5):
-                humidity_grid[key][lat_long[j]] = month_humidities[j]
+    humidity_grid[key] = {}
+
+    for j in range(len(lat_long)):
+        # Look only at the latitudes and longitudes around the United States
+        if (lat_long[j][0] <= 72.5) and (lat_long[j][0] >= 17.5) \
+        and (lat_long[j][1] <= -64.5) and (lat_long[j][1] >= -179.5):
+            humidity_grid[key][lat_long[j]] = month_humidities[j]
 
 # Save dictionary into a file
 with open('us_humidity.pickle', 'wb') as fp:
