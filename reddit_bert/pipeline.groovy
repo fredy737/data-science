@@ -9,7 +9,7 @@ pipeline {
         stage('Clone repository') {
             steps {
                 // Clone Git repository
-                git url: 'https://github.com/fredy737/data-science.git', branch: 'imp/reddit-comments-bert'
+                git url: 'https://github.com/fredy737/data-science.git', branch: 'imp/reddit-comments-bert-2'
             }
         }
         stage('Set up Python environment') {
