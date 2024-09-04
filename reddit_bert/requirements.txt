@@ -1,0 +1,8 @@
+boto3
+numpy
+pandas
+scikit-learn
+torch==1.10.0
+transformers
+mlflow==2.8.0
+pyyaml
