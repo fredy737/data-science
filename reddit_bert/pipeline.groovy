@@ -1,50 +1,34 @@
 pipeline {
     agent any
-
-    environment {
-        S3_BUCKET = 'fredy-data'
+    parameters {
+        booleanParam(name: 'RUN_SPLIT_DATA', defaultValue: true, description: 'Run Split Data Stage')
+        booleanParam(name: 'RUN_TRAIN', defaultValue: true, description: 'Run Train Stage')
+        booleanParam(name: 'RUN_PREDICT', defaultValue: true, description: 'Run Predict Stage')
     }
-
     stages {
-        stage('Clone repository') {
+        stage('Clone Repository') {
             steps {
-                // Clone Git repository
-                git url: 'https://github.com/fredy737/data-science.git', branch: 'imp/reddit-comments-bert-2'
+                git url: 'https://github.com/fredy737/data-science.git'
             }
         }
-        stage('Set up Python environment') {
-            steps {
-                // Set up virtual environment and install dependencies
-                sh 'python 3 -m venv venv'
-                sh './venv/bin/pip install -r data-science/reddit_bert/requirements.txt'
-            }
-        }
-        stage('prepare_data') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    sh './venv/bin/python data-science/reddit_bert/commands/prepare_data.py'
+                    {
+                        sh 'docker build -t reddit_bert .'
+                    }
                 }
             }
         }
-        stage('split_data') {
+        stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh './venv/bin/python data-science/reddit_bert/commands/split_data.py'
+                    {
+                        sh 'kubectl apply -f src/kubernetes/deployment.yaml'
+                        sh 'kubectl apply -f src/kubernetes/service.yaml'
+                    }
                 }
             }
-        }
-        stage('train') {
-            steps {
-                script {
-                    sh './venv/bin/python data-science/reddit_bert/commands/train.py'
-                }
-            }
-        }
-    }
-    post {
-        always {
-            // Cleanup actions
-            cleanWs()
         }
     }
 }
