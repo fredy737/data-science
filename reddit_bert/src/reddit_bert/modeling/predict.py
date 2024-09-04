@@ -9,15 +9,14 @@ from reddit_bert.modeling.model import RedditDataset, DistilBERTWithSubreddit, \
     convert_to_dataset, model_predict, train_subreddit_encoder
 
 
-model_str = 'distilbert-base-uncased'
-tokenizer = DistilBertTokenizer.from_pretrained(model_str)
-
-
 def load_model(n_subreddits):
+    from reddit_bert.conf import settings
     # s3 parameters
-    s3_bucket = 'fredy-data'
-    s3_object_name = 'reddit/reddit_model.pt'
-    download_path = 'model.pth'
+    model_path = settings.S3['model_local_path']
+    s3_bucket = settings.S3['s3_bucket']
+
+    s3_object_name = f'reddit/{model_path}'
+    download_path = model_path
 
     # Initialize the s3 client
     s3_client = boto3.client('s3')
@@ -32,9 +31,15 @@ def load_model(n_subreddits):
 
 
 def predict():
+    from reddit_bert.conf import settings
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    data = pd.read_parquet('s3://fredy-data/reddit/reddit_comment_sample.parquet/')
+    model_str = settings.MODEL['tokenizer_model_str']
+    tokenizer = DistilBertTokenizer.from_pretrained(model_str)
+
+    data_path = settings.DATA['raw_data']
+    data = pd.read_parquet(data_path)
 
     comment_ids = data['comment_id'].tolist()
     comments = data['body'].tolist()

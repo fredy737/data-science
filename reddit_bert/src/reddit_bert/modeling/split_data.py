@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-
 logger = logging.getLogger(__name__)
 
 target_col = 'controversiality'
@@ -27,7 +26,10 @@ def downsample_data(df):
 
 
 def extract_transform():
-    data = pd.read_parquet('s3://fredy-data/reddit/reddit_comment_sample.parquet/')
+    from reddit_bert.conf import settings
+
+    raw_data_path = settings.DATA['raw_data']
+    data = pd.read_parquet(raw_data_path)
 
     sampled_data = downsample_data(data)
 

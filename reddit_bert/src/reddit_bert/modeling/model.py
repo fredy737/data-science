@@ -12,9 +12,6 @@ from transformers import DistilBertModel, AdamW
 
 logger = logging.getLogger(__name__)
 
-model_str = 'distilbert-base-uncased'
-batch_size = 32
-
 
 class RedditDataset(Dataset):
     def __init__(self, texts, encoded_subreddits, tokenizer, labels=None, max_length=128):
@@ -58,7 +55,7 @@ class RedditDataset(Dataset):
 class DistilBERTWithSubreddit(nn.Module):
     def __init__(self, n_subreddits, n_classes):
         super(DistilBERTWithSubreddit, self).__init__()
-        self.bert = DistilBertModel.from_pretrained(model_str)
+        self.bert = DistilBertModel.from_pretrained('distilbert-base-uncased')
         # Embedding size for subreddit
         self.subreddit_embedding = nn.Embedding(n_subreddits, 32)
         self.classifier = nn.Linear(self.bert.config.hidden_size + 32, n_classes)
@@ -88,7 +85,7 @@ def train_subreddit_encoder(df, provided_encoder=None):
     return df, label_encoder
 
 
-def convert_to_dataset(df, tokenizer, target_col=None):
+def convert_to_dataset(df, tokenizer, batch_size, target_col=None):
     if target_col:
         reddit_dataset = RedditDataset(
             df['body'].values,

@@ -1,4 +1,3 @@
-import unittest
 from unittest import mock, TestCase
 
 import pandas as pd
@@ -107,7 +106,11 @@ class TestSplitData(TestCase):
         )
 
     @mock.patch(f'{base}.pd.read_parquet')
-    def test_extract_transform(self, mock_read_parquet):
+    @mock.patch('reddit_bert.conf.settings')
+    def test_extract_transform(self, mock_settings, mock_read_parquet):
+        mock_settings.DATA = {
+            'raw_data': 'data_path',
+        }
         # Configure the mock to return the mock DataFrame
         mock_read_parquet.return_value = self.mock_df
 
@@ -115,7 +118,7 @@ class TestSplitData(TestCase):
         train_df, test_df = split_data.extract_transform()
 
         # Assert the mock was called once with the expected filepath
-        expected_path = 's3://fredy-data/reddit/reddit_comment_sample.parquet/'
+        expected_path = 'data_path'
         mock_read_parquet.assert_called_once_with(expected_path)
 
         expected_train_df = pd.DataFrame([

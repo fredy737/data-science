@@ -100,6 +100,7 @@ class TestConvertToDataset(TestCase):
         data_loader = convert_to_dataset(
             self.df,
             self.tokenizer,
+            32,
             target_col='target',
         )
         self.assertIsInstance(data_loader, DataLoader)
@@ -112,6 +113,8 @@ class TestConvertToDataset(TestCase):
 
 class TestModelTrainingAndPrediction(TestCase):
 
+    base = 'reddit_bert.modeling.model'
+
     def setUp(self):
         self.device = torch.device('cpu')
         self.tokenizer = tokenizer
@@ -119,6 +122,7 @@ class TestModelTrainingAndPrediction(TestCase):
         self.data_loader = convert_to_dataset(
             self.df,
             self.tokenizer,
+            32,
             target_col='target',
         )
 
